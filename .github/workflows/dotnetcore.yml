@@ -1,7 +1,12 @@
 name: eShopOnWeb Build and Test
 
-#Triggers (uncomment line below to use it)
-#on: [push, pull_request, workflow_dispatch]
+# Triggers the workflow on push or pull request events but only for the main branch
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -13,11 +18,14 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
+        # Use a stable .NET 8 SDK, not a preview version
         dotnet-version: '8.0.x'
-        dotnet-quality: 'preview'
 
-    - name: Build with dotnet
-      run: dotnet build ./eShopOnWeb.sln --configuration Release
+    - name: Restore dependencies
+      run: dotnet restore ./eShopOnWeb.sln
+
+    - name: Build
+      run: dotnet build ./eShopOnWeb.sln --configuration Release --no-restore
     
-    - name: Test with dotnet
-      run: dotnet test ./eShopOnWeb.sln --configuration Release
+    - name: Test
+      run: dotnet test ./eShopOnWeb.sln --configuration Release --no-build --verbosity normal
